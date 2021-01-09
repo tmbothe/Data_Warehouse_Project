@@ -135,6 +135,7 @@ For this project, we will building a star model with fact and dimension tables. 
  ORDER BY play_count DESC
  LIMIT 10;
 `
+
 **Result**:
 
  ![image](https://github.com/tmbothe/Data_Warehouse_Project/blob/main/images/mostpopular_artist.PNG)
