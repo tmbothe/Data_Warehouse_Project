@@ -6,7 +6,8 @@ This project consists of creating a database and build an ETL pipeline to store 
 This will help the analytics to analyze and derive insights from data.
 
 ## Data description
-There are two sources of dataset, the **Song Dataset** and the **Log Dataset** .  Both dataset are currently stored in amazon S3.
+There are two sources of dataset, the **Song Dataset** and the **Log Dataset** .  Both dataset are currently stored in amazon S3. These files will be read from redshift and stored in some staging tables. Then another process will extract the data from staging tables and load in final tables.
+
 ### The Song Dataset
 The song data is stored at : `s3://udacity-dend/song_data`  
 This is a collection of JSON data that store songs data. The files are partitioned by the three letters of of each song's track ID. These are two examples:
@@ -33,6 +34,44 @@ The file is structured as :
 ## Choice of Data Model
 
 For this project, we will building a star model with fact and dimension tables. This schema is analytic focus as all dimensions tables are one join away from that fact tables that easier queries retrieval. Here is tables description:
+
+### statging tables structure
+ The staging tables will store all fields as they are from the files in S3
+ - **staging events table** 
+ 'staging_events
+    artist    
+    auth      
+    firstName 
+    gender    
+    itemInSession 
+    lastName  
+    length    
+    level 
+    location
+    method 
+    page 
+    registration 
+    sessionId 
+    song 
+    status igint,
+    ts  
+    userAgent 
+    userId  
+ '
+ - **staging songs tables**
+ ` staging_songs
+     num_songs 
+     artist_id
+     artist_latitude 
+     artist_longitude
+     artist_location 
+     artist_name 
+     song_id 
+     title 
+     duration
+     year
+     `
+### Final tables
 
 **Fact Table**
 
@@ -75,7 +114,23 @@ For this project, we will building a star model with fact and dimension tables. 
 - Open command line and move to the repository folder
 - Run the `create_tables.py` file to drop and create the database as well as all tables
 - Run the `etl.py` file to read, extract, transform and load data to different tables
- 
+
+## Examples of Queries
+
+- **First 10 artists** 
+ `select * from artists  where  limit 10;`
+
+- **10 most popular artists**
+`SELECT name as  artist_name ,COUNT(DISTINCT session_id) as play_count
+FROM songplays s
+JOIN artists a ON a.artist_id = s.artist_id
+WHERE level='paid'
+GROUP BY name
+ORDER BY play_count DESC
+LIMIT 10;
+
+`
+
  
 
 
