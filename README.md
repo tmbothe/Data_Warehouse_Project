@@ -117,19 +117,28 @@ For this project, we will building a star model with fact and dimension tables. 
 
 ## Examples of Queries
 
-- **First 10 artists** 
+- **First 10 artists:** 
+
  `select * from artists  where  limit 10;`
 
-- **10 most popular artists**
-`SELECT name as  artist_name ,COUNT(DISTINCT session_id) as play_count
-FROM songplays s
-JOIN artists a ON a.artist_id = s.artist_id
-WHERE level='paid'
-GROUP BY name
-ORDER BY play_count DESC
-LIMIT 10;
+ **Result:**
 
+  ![image](https://github.com/tmbothe/Data_Warehouse_Project/blob/main/images/first10_artst.PNG)
+
+- **10 most popular artists:**
+
+`SELECT name as  artist_name ,COUNT(DISTINCT session_id) as play_count
+ FROM songplays s
+ JOIN artists a ON a.artist_id = s.artist_id
+ WHERE level='paid'
+ GROUP BY name
+ ORDER BY play_count DESC
+ LIMIT 10;
 `
+**Result**:
+
+ ![image](https://github.com/tmbothe/Data_Warehouse_Project/blob/main/images/mostpopular_artist.PNG)
+
 
  
 
