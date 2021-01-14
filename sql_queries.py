@@ -65,7 +65,7 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
 CREATE TABLE songplays(
      songplay_id int identity(1, 1),
-     start_time time not null,
+     start_time datetime not null,
      user_id varchar(40) not null,
      level varchar(10) not null,
      song_id varchar(40)  not null,
@@ -150,10 +150,11 @@ staging_songs_copy = ("""
 
 songplay_table_insert = ("""
 INSERT INTO songplays(start_time,user_id,level,song_id,artist_id,session_id,location,user_agent)
-SELECT DISTINCT CAST(split_part(ts,' ',2) as time) as mytime,userid,level,song_id,artist_id,sessionid,location,useragent
+SELECT DISTINCT CAST(ts as datetime) as mytime,
+       userid,level,song_id,artist_id,sessionid,location,useragent
 FROM staging_events se
-JOIN staging_songs so  ON so.artist_name = se.artist
-
+JOIN staging_songs so  ON so.artist_name = se.artist   AND se.song=so.title
+WHERE se.page = 'NextSong' AND so.duration = ROUND(se.length)
  ;
 """)
 
@@ -184,16 +185,29 @@ WHERE artist_id is not null
 
 time_table_insert = ("""
 INSERT INTO time(start_time,hour,day,week,month,year,weekday)
-SELECT DISTINCT Cast(split_part(ts,' ',2) as time) as mytime,cast(split_part(split_part(ts,' ',2) ,':',1) as int) as hour,
-cast(split_part(split_part(ts,'-',3),' ',1) as int) as day , cast(date_part(w,ts) as int) as week, cast(split_part(ts,'-',2) as int) as month, cast(split_part(ts,'-',1) as int) as year,to_char(ts, 'Day') as dayofweek
-FROM staging_events
-WHERE ts is not null
+SELECT DISTINCT start_time,
+ cast(split_part(split_part(start_time,' ',2) ,':',1) as int) as hour,
+ cast(split_part(split_part(start_time,'-',3),' ',1) as int) as day , 
+ cast(date_part(w,start_time) as int) as week,
+ cast(split_part(start_time,'-',2) as int) as month, 
+ cast(split_part(start_time,'-',1) as int) as year,
+ to_char(start_time, 'Day') as dayofweek
+FROM songplays 
+
 ;
 """)
 
 # QUERY LISTS
 
-create_table_queries = [staging_events_table_create, time_table_create, staging_songs_table_create, user_table_create, song_table_create, artist_table_create, songplay_table_create]
-drop_table_queries   = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
+create_table_queries = [staging_events_table_create, time_table_create,\
+                        staging_songs_table_create, user_table_create,\
+                        song_table_create, artist_table_create, songplay_table_create]
+
+drop_table_queries   = [staging_events_table_drop, staging_songs_table_drop,\
+                        songplay_table_drop, user_table_drop, song_table_drop,\
+                        artist_table_drop, time_table_drop]
+
 copy_table_queries   = [staging_events_copy, staging_songs_copy]
-insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert, time_table_insert]
+insert_table_queries = [songplay_table_insert, user_table_insert,\
+                        song_table_insert, artist_table_insert, \
+                        time_table_insert]
