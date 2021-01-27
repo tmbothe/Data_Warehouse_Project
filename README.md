@@ -1,4 +1,4 @@
-# Project: Data Modeling and ETL with Postgres and Python
+# Project:  DataWarehouse: Build ETL pipeline to extract data from S3 to Redshift
 ## Project Description
 
 A compagny that has been collecting songs' data and users activity wants an efficient model to store and analyze the data. The data currently resides in folders in JSON format.
